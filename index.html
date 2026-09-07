@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delícias aqui Delícias acolá · Sabores de Minas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cream:   '#FDFBF7',
+        cardbg:  '#FFFFFF',
+        tijolo:  '#7C2D12',
+        terracota:'#9A3412',
+        ambar:   '#D97706',
+        oliva:   '#15803D',
+        creme2:  '#F4ECDF',
+        tinta:   '#2A211A'
+      },
+      fontFamily: {
+        display: ['Fraunces','Georgia','serif'],
+        body:    ['Inter','system-ui','sans-serif']
+      }
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:#FDFBF7;color:#2A211A;font-family:Inter,sans-serif;}
+  *{-webkit-tap-highlight-color:transparent;}
+  ::selection{background:#D97706;color:#FDFBF7;}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:0 24px;}
+  .press{transition:transform .12s ease, box-shadow .2s ease, background .2s ease, color .2s ease;}
+  .press:active{transform:scale(.97);}
+
+  .imgwrap{position:relative;overflow:hidden;background:linear-gradient(135deg,#f0e7d8,#e6d7c2);}
+  .imgwrap .emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px;opacity:.75;}
+  .imgwrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .55s ease;}
+  .card:hover .imgwrap img{transform:scale(1.09);}
+
+  .selo{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;letter-spacing:.07em;
+        text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1.4px solid currentColor;background:rgba(255,255,255,.92);}
+
+  header.site{position:sticky;top:0;z-index:40;background:#FDFBF7;border-bottom:1px solid #efe4d3;transition:box-shadow .25s;}
+  header.site.shrink{box-shadow:0 6px 22px rgba(60,30,10,.08);}
+  .navlink{font-size:13.5px;font-weight:600;color:#7C2D12;letter-spacing:.01em;position:relative;padding:14px 0;white-space:nowrap;}
+  .navlink::after{content:"";position:absolute;left:0;right:100%;bottom:8px;height:2px;background:#D97706;transition:right .25s;}
+  .navlink:hover::after,.navlink.active::after{right:0;}
+
+  .drawer{position:fixed;top:0;right:-460px;width:430px;max-width:94vw;height:100%;background:#FDFBF7;z-index:80;
+          box-shadow:-18px 0 55px rgba(60,30,10,.25);transition:right .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;}
+  .drawer.open{right:0;}
+  .backdrop{position:fixed;inset:0;background:rgba(40,25,12,.5);opacity:0;pointer-events:none;transition:.3s;z-index:70;}
+  .backdrop.open{opacity:1;pointer-events:auto;}
+
+  .modal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:20px;}
+  .modal.open{display:flex;}
+  .modal .mback{position:absolute;inset:0;background:rgba(40,25,12,.55);backdrop-filter:blur(3px);}
+  .modal .mbox{position:relative;background:#FDFBF7;border-radius:24px;width:100%;max-width:440px;max-height:92vh;overflow-y:auto;
+               box-shadow:0 30px 80px rgba(0,0,0,.35);animation:pop .3s cubic-bezier(.2,.9,.3,1);}
+  @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:none;}}
+
+  .mobmenu{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .mobmenu.open{max-height:420px;}
+
+  .fadeup{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;}
+  .fadeup.in{opacity:1;transform:none;}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:95;
+         background:#15803D;color:#fff;font-size:14px;font-weight:600;padding:12px 20px;border-radius:12px;
+         box-shadow:0 12px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.3s;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .no-sb::-webkit-scrollbar{display:none;} .no-sb{scrollbar-width:none;}
+</style>
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="bg-tijolo text-cream text-center text-[12.5px] font-medium py-2.5 px-4">
+  <div class="wrap flex items-center justify-center gap-2 flex-wrap">
+    <span>🚚 Frete grátis para todo o Sudeste em compras acima de R$ 200</span>
+    <span class="opacity-40 hidden sm:inline">|</span>
+    <span class="hidden sm:inline">🧀 Produtos 100% artesanais direto de Minas</span>
+  </div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="site" id="header">
+  <div class="wrap flex items-center gap-5 py-3.5">
+    <!-- logo -->
+    <a href="#home" class="flex items-center gap-3 flex-shrink-0">
+      <img src="logo-delicias-aqui-delicias-acola.png" alt="Delícias aqui Delícias acolá" class="h-14 w-auto">
+      <span class="hidden xl:block text-[11px] text-ambar font-semibold tracking-wide leading-tight max-w-[130px]">O autêntico sabor de Minas</span>
+    </a>
+
+    <!-- busca -->
+    <div class="hidden md:flex flex-1 max-w-xl mx-auto">
+      <div class="flex w-full bg-cream border border-creme2 rounded-full overflow-hidden focus-within:border-ambar transition">
+        <span class="pl-4 flex items-center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b08a5f" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4" stroke-linecap="round"/></svg>
+        </span>
+        <input id="search" type="text" placeholder="Buscar queijo canastra, doce de leite, café coado..."
+               oninput="setQuery(this.value)" class="flex-1 bg-transparent px-3 py-2.5 text-[13.5px] outline-none">
+      </div>
+    </div>
+
+    <!-- ações -->
+    <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto md:ml-0">
+      <button class="press hidden sm:flex flex-col items-center px-2.5 text-tijolo" onclick="showToast('Área do cliente em breve')" aria-label="Minha Conta">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg>
+        <span class="text-[9.5px] font-semibold mt-0.5">Conta</span>
+      </button>
+      <button class="press hidden sm:flex flex-col items-center px-2.5 text-tijolo" onclick="showToast('Seus pedidos em breve')" aria-label="Meus Pedidos">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h12l1 4H5z"/><path d="M5 7v13a1 1 0 001 1h12a1 1 0 001-1V7" stroke-linejoin="round"/><path d="M9 11h6" stroke-linecap="round"/></svg>
+        <span class="text-[9.5px] font-semibold mt-0.5">Pedidos</span>
+      </button>
+      <button class="press relative flex flex-col items-center px-2.5 text-tijolo" onclick="openCart()" aria-label="Sacola">
+        <span class="relative">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 8h12l-1 12H7L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2" stroke-linecap="round"/></svg>
+          <span id="cart-badge" class="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-ambar text-white text-[10.5px] font-bold flex items-center justify-center border-2 border-cream" style="display:none">0</span>
+        </span>
+        <span class="text-[9.5px] font-semibold mt-0.5">Sacola</span>
+      </button>
+      <button class="press lg:hidden w-10 h-10 flex items-center justify-center text-tijolo" onclick="toggleMenu()" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- busca mobile -->
+  <div class="md:hidden wrap pb-3">
+    <div class="flex w-full bg-cream border border-creme2 rounded-full overflow-hidden">
+      <span class="pl-4 flex items-center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b08a5f" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4" stroke-linecap="round"/></svg></span>
+      <input type="text" placeholder="Buscar delícias de Minas..." oninput="setQuery(this.value)" class="flex-1 bg-transparent px-3 py-2.5 text-[13.5px] outline-none">
+    </div>
+  </div>
+
+  <!-- nav -->
+  <nav class="hidden lg:block border-t border-creme2">
+    <div class="wrap flex items-center justify-center gap-7">
+      <a href="#home" class="navlink" onclick="setCat('todos')">Home</a>
+      <a href="#vitrine" class="navlink" onclick="setCat('queijos')">Queijos Artesanais</a>
+      <a href="#vitrine" class="navlink" onclick="setCat('doces')">Doces &amp; Compotas</a>
+      <a href="#vitrine" class="navlink" onclick="setCat('cafes')">Cafés &amp; Cachaças</a>
+      <a href="#vitrine" class="navlink" onclick="setCat('embutidos')">Embutidos &amp; Defumados</a>
+      <a href="#vitrine" class="navlink" onclick="setCat('kits')">Kits &amp; Cestas</a>
+      <a href="#produtores" class="navlink">Nossos Produtores</a>
+      <a href="#contato" class="navlink">Contato</a>
+    </div>
+  </nav>
+
+  <!-- nav mobile -->
+  <div class="mobmenu lg:hidden border-t border-creme2" id="mobmenu">
+    <div class="wrap flex flex-col py-2">
+      <a href="#home" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="setCat('todos');toggleMenu()">Home</a>
+      <a href="#vitrine" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="setCat('queijos');toggleMenu()">Queijos Artesanais</a>
+      <a href="#vitrine" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="setCat('doces');toggleMenu()">Doces &amp; Compotas</a>
+      <a href="#vitrine" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="setCat('cafes');toggleMenu()">Cafés &amp; Cachaças</a>
+      <a href="#vitrine" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="setCat('embutidos');toggleMenu()">Embutidos &amp; Defumados</a>
+      <a href="#vitrine" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="setCat('kits');toggleMenu()">Kits &amp; Cestas</a>
+      <a href="#produtores" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="toggleMenu()">Nossos Produtores</a>
+      <a href="#contato" class="py-2.5 text-[14px] font-semibold text-tijolo" onclick="toggleMenu()">Contato</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section id="home" class="relative">
+  <div class="imgwrap min-h-[440px] lg:min-h-[560px]">
+    <span class="emoji" style="font-size:80px">🧀</span>
+    <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=1600&q=75" onerror="this.remove()" alt="Mesa farta mineira">
+    <div class="absolute inset-0" style="background:linear-gradient(90deg,rgba(60,20,8,.85) 0%,rgba(60,20,8,.55) 45%,rgba(60,20,8,.15) 100%);"></div>
+  </div>
+  <div class="absolute inset-0 flex items-center">
+    <div class="wrap w-full">
+      <div class="max-w-xl fadeup in">
+        <span class="inline-flex items-center gap-2 bg-ambar text-tijolo font-bold text-[12px] px-3.5 py-1.5 rounded-full tracking-wide">
+          <span class="w-1.5 h-1.5 rounded-full bg-tijolo"></span> DIRETO DA SERRA DA CANASTRA
+        </span>
+        <h1 class="font-display font-semibold text-cream text-[40px] sm:text-[54px] leading-[1.02] mt-4">
+          O verdadeiro sabor da roça na sua mesa
+        </h1>
+        <p class="text-cream/85 text-[17px] leading-relaxed mt-4 max-w-md">
+          Queijos curados, doces de tacho, cafés especiais e cachaças artesanais, selecionados das melhores famílias produtoras de Minas Gerais.
+        </p>
+        <div class="flex flex-wrap gap-3 mt-7">
+          <a href="#vitrine" class="press inline-flex items-center gap-2 bg-ambar text-tijolo font-bold text-[15px] px-7 py-3.5 rounded-full">
+            Explorar o empório
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7C2D12" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#categorias" class="press inline-flex items-center gap-2 bg-cream/10 border border-cream/40 text-cream font-semibold text-[15px] px-6 py-3.5 rounded-full hover:bg-cream/20">
+            Ver categorias
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VALUE PROPS ===== -->
+<section class="bg-tijolo">
+  <div class="wrap grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 py-7">
+    <div class="flex items-center gap-3 text-cream">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="1.6"><path d="M3 20l4-11 5 3 5-9 4 17z" stroke-linejoin="round"/></svg>
+      <div><p class="font-semibold text-[13.5px] leading-tight">Direto da Serra da Canastra</p><p class="text-cream/60 text-[11.5px]">Origem garantida</p></div>
+    </div>
+    <div class="flex items-center gap-3 text-cream">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="1.6"><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M8 7V5a4 4 0 018 0v2M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><p class="font-semibold text-[13.5px] leading-tight">Embalagem térmica garantida</p><p class="text-cream/60 text-[11.5px]">Chega fresquinho</p></div>
+    </div>
+    <div class="flex items-center gap-3 text-cream">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18" stroke-linecap="round"/></svg>
+      <div><p class="font-semibold text-[13.5px] leading-tight">Pagamento no Pix ou até 6x</p><p class="text-cream/60 text-[11.5px]">Sem complicação</p></div>
+    </div>
+    <div class="flex items-center gap-3 text-cream">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="1.6"><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M15 19c0-2 .5-3.5 2-4.3 2 .3 4 1.8 4 4.3" stroke-linecap="round"/></svg>
+      <div><p class="font-semibold text-[13.5px] leading-tight">Produtores familiares</p><p class="text-cream/60 text-[11.5px]">Renda que fica na roça</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CATEGORIAS EM DESTAQUE ===== -->
+<section id="categorias" class="py-14 lg:py-20">
+  <div class="wrap">
+    <div class="fadeup text-center max-w-xl mx-auto mb-10">
+      <p class="text-ambar font-semibold text-[13px] tracking-widest uppercase">Nosso empório</p>
+      <h2 class="font-display font-semibold text-tijolo text-[32px] sm:text-[40px] leading-tight mt-2">Escolha por categoria</h2>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="cat-cards"></div>
+  </div>
+</section>
+
+<!-- ===== VITRINE DE PRODUTOS ===== -->
+<section id="vitrine" class="py-6 lg:py-10 bg-creme2/40">
+  <div class="wrap">
+    <div class="fadeup flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      <div>
+        <p class="text-ambar font-semibold text-[13px] tracking-widest uppercase">Vitrine</p>
+        <h2 class="font-display font-semibold text-tijolo text-[32px] sm:text-[40px] leading-tight mt-1" id="vitrine-title">Todos os produtos</h2>
+      </div>
+      <div class="flex flex-wrap gap-2" id="filters"></div>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5" id="grid"></div>
+    <p id="empty" class="hidden text-center text-tinta/50 py-16">Nenhuma delícia encontrada. Tente outra busca.</p>
+  </div>
+</section>
+
+<!-- ===== STORYTELLING ===== -->
+<section id="produtores" class="py-16 lg:py-24">
+  <div class="wrap grid lg:grid-cols-2 gap-12 items-center">
+    <div class="fadeup relative">
+      <div class="imgwrap rounded-[26px] aspect-[4/3] shadow-xl">
+        <span class="emoji">⛰️</span>
+        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=75" onerror="this.remove()" alt="Interior de Minas Gerais">
+      </div>
+      <div class="absolute -bottom-6 -right-4 bg-cream rounded-2xl shadow-xl p-4 w-52 border border-creme2 hidden sm:block">
+        <div class="flex items-center gap-2">
+          <span class="w-10 h-10 rounded-full bg-oliva/15 flex items-center justify-center text-[20px]">🧀</span>
+          <div><p class="text-[12.5px] font-bold text-tijolo leading-tight">Família Reis</p><p class="text-[11px] text-tinta/55">Serra da Canastra</p></div>
+        </div>
+        <p class="text-[11.5px] text-tinta/65 mt-2 leading-snug">Quatro gerações fazendo queijo no mesmo terreiro.</p>
+      </div>
+    </div>
+    <div class="fadeup">
+      <p class="text-ambar font-semibold text-[13px] tracking-widest uppercase">Do produtor para a sua mesa</p>
+      <h2 class="font-display font-semibold text-tijolo text-[32px] sm:text-[42px] leading-tight mt-2">Tradição e afeto em cada peça</h2>
+      <p class="text-tinta/75 text-[16px] leading-relaxed mt-5">
+        Cada delícia do nosso empório carrega a história de uma família do interior de Minas. Trabalhamos lado a lado com pequenos produtores que mantêm vivas receitas passadas de geração em geração, do tacho de cobre ao fumeiro a lenha.
+      </p>
+      <p class="text-tinta/75 text-[16px] leading-relaxed mt-4">
+        Ao comprar aqui, você leva sabor de verdade para a sua casa e ajuda a manter viva a agricultura familiar mineira.
+      </p>
+      <div class="grid grid-cols-3 gap-4 mt-8">
+        <div><p class="font-display font-semibold text-terracota text-[28px] leading-none">30+</p><p class="text-tinta/60 text-[12px] mt-1">Famílias parceiras</p></div>
+        <div><p class="font-display font-semibold text-terracota text-[28px] leading-none">7</p><p class="text-tinta/60 text-[12px] mt-1">Anos de estrada</p></div>
+        <div><p class="font-display font-semibold text-terracota text-[28px] leading-none">100%</p><p class="text-tinta/60 text-[12px] mt-1">Artesanal</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer id="contato" class="bg-tijolo text-cream pt-16 pb-8">
+  <div class="wrap">
+    <!-- newsletter -->
+    <div class="bg-terracota/60 rounded-3xl p-8 lg:p-10 grid lg:grid-cols-2 gap-6 items-center mb-14">
+      <div>
+        <h3 class="font-display font-semibold text-[26px] leading-tight">Receba receitas e ofertas exclusivas de Minas</h3>
+        <p class="text-cream/75 text-[14px] mt-2">Cadastre seu e-mail e ganhe 10% na primeira compra com o cupom UAI10.</p>
+      </div>
+      <form onsubmit="subscribe(event)" class="flex gap-2">
+        <input type="email" required placeholder="Seu melhor e-mail"
+               class="flex-1 bg-cream text-tinta rounded-full px-5 py-3.5 text-[14px] outline-none">
+        <button class="press bg-ambar text-tijolo font-bold text-[14px] px-6 rounded-full">Assinar</button>
+      </form>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 pb-12 border-b border-cream/15">
+      <div class="col-span-2 lg:col-span-1">
+        <div class="inline-flex items-center">
+          <img src="logo-delicias-aqui-delicias-acola.png" alt="Delícias aqui Delícias acolá" class="h-[72px] w-auto bg-cream rounded-2xl p-2">
+        </div>
+        <p class="text-cream/70 text-[13.5px] leading-relaxed mt-4">O autêntico sabor de Minas, direto das famílias produtoras para a sua mesa. Cotia / São Paulo.</p>
+        <div class="flex gap-3 mt-5">
+          <a href="#" class="press w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center" aria-label="Instagram"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FDFBF7" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#FDFBF7"/></svg></a>
+          <a href="#" class="press w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center" aria-label="Facebook"><svg width="19" height="19" viewBox="0 0 24 24" fill="#FDFBF7"><path d="M14 9h3V6h-3c-2 0-3 1.3-3 3v2H9v3h2v7h3v-7h2.5l.5-3H14V9z"/></svg></a>
+          <a href="https://wa.me/5511996614681" target="_blank" rel="noopener" class="press w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center" aria-label="WhatsApp"><svg width="19" height="19" viewBox="0 0 24 24" fill="#FDFBF7"><path d="M12 2a10 10 0 00-8.6 15L2 22l5.2-1.3A10 10 0 1012 2zm5.7 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.6-.6-2.9-1.3-4.8-4.2-5-4.4-.1-.2-1.1-1.5-1.1-2.9 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .5l-.4.6c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.8.9c.3.1.4.2.5.3.1.3.1.8-.1 1.5z"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <p class="font-display font-semibold text-ambar text-[14px] mb-3">Categorias</p>
+        <ul class="space-y-2 text-cream/75 text-[13.5px]">
+          <li><a href="#vitrine" class="hover:text-ambar" onclick="setCat('queijos')">Queijos Artesanais</a></li>
+          <li><a href="#vitrine" class="hover:text-ambar" onclick="setCat('doces')">Doces &amp; Compotas</a></li>
+          <li><a href="#vitrine" class="hover:text-ambar" onclick="setCat('cafes')">Cafés &amp; Cachaças</a></li>
+          <li><a href="#vitrine" class="hover:text-ambar" onclick="setCat('embutidos')">Embutidos &amp; Defumados</a></li>
+          <li><a href="#vitrine" class="hover:text-ambar" onclick="setCat('kits')">Kits &amp; Cestas</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="font-display font-semibold text-ambar text-[14px] mb-3">Institucional</p>
+        <ul class="space-y-2 text-cream/75 text-[13.5px]">
+          <li><a href="#produtores" class="hover:text-ambar">Nossos Produtores</a></li>
+          <li><a href="#" class="hover:text-ambar">Sobre nós</a></li>
+          <li><a href="#" class="hover:text-ambar">Trocas e devoluções</a></li>
+          <li><a href="#" class="hover:text-ambar">Política de entrega</a></li>
+          <li><a href="#" class="hover:text-ambar">Fale conosco</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="font-display font-semibold text-ambar text-[14px] mb-3">Pagamento &amp; segurança</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-cream/10 rounded-md px-2.5 py-1.5 text-[10.5px] font-semibold">PIX</span>
+          <span class="bg-cream/10 rounded-md px-2.5 py-1.5 text-[10.5px] font-semibold">VISA</span>
+          <span class="bg-cream/10 rounded-md px-2.5 py-1.5 text-[10.5px] font-semibold">MASTER</span>
+          <span class="bg-cream/10 rounded-md px-2.5 py-1.5 text-[10.5px] font-semibold">ELO</span>
+          <span class="bg-cream/10 rounded-md px-2.5 py-1.5 text-[10.5px] font-semibold">BOLETO</span>
+        </div>
+        <div class="flex items-center gap-2 mt-4 text-cream/70 text-[12px]">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="1.8"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Compra 100% segura
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6">
+      <p class="text-cream/55 text-[12.5px]">© 2026 Delícias aqui Delícias acolá · Sabores de Minas. Todos os direitos reservados.</p>
+      <p class="text-cream/55 text-[12.5px]">Feito com afeto em Cotia/SP.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== CART DRAWER ===== -->
+<div class="backdrop" id="backdrop" onclick="closeCart()"></div>
+<aside class="drawer" id="drawer" aria-label="Sacola de compras">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-creme2">
+    <div>
+      <p class="font-display font-semibold text-tijolo text-[19px]">Sua sacola</p>
+      <p class="text-[12px] text-tinta/55" id="drawer-sub">Confira seus itens</p>
+    </div>
+    <button class="press w-9 h-9 rounded-full bg-creme2 flex items-center justify-center" onclick="closeCart()" aria-label="Fechar">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7C2D12" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <!-- barra frete grátis -->
+  <div class="px-5 py-3.5 bg-creme2/50 border-b border-creme2" id="ship-bar">
+    <p class="text-[12px] text-tinta/75 mb-1.5" id="ship-msg"></p>
+    <div class="h-2 rounded-full bg-white overflow-hidden"><div id="ship-fill" class="h-full rounded-full bg-oliva transition-all duration-500" style="width:0%"></div></div>
+  </div>
+
+  <div class="flex-1 overflow-y-auto no-sb px-5 py-4" id="drawer-items"></div>
+
+  <div class="px-5 py-4 border-t border-creme2 bg-cream" id="drawer-foot" style="display:none">
+    <!-- cupom -->
+    <div class="flex gap-2 mb-3">
+      <input id="coupon" type="text" placeholder="Cupom (ex: UAI10)" oninput="this.value=this.value.toUpperCase()"
+             class="flex-1 bg-white border border-creme2 rounded-xl px-3 py-2.5 text-[13px] outline-none focus:border-ambar">
+      <button class="press bg-oliva text-white text-[13px] font-semibold px-4 rounded-xl" onclick="applyCoupon()">Aplicar</button>
+    </div>
+    <p id="coupon-msg" class="text-[11.5px] mb-2 hidden"></p>
+    <div class="flex justify-between text-[13px] text-tinta/70 mb-1"><span>Subtotal</span><span id="sub-val">R$ 0,00</span></div>
+    <div class="flex justify-between text-[13px] text-tinta/70 mb-1 hidden" id="desc-row"><span id="desc-label">Desconto</span><span id="desc-val" class="text-oliva font-semibold">- R$ 0,00</span></div>
+    <div class="flex justify-between items-end mt-2 pt-2 border-t border-creme2">
+      <span class="text-[14px] font-semibold text-tijolo">Total</span>
+      <span class="font-display font-semibold text-tijolo text-[24px]" id="total-val">R$ 0,00</span>
+    </div>
+    <button class="press w-full mt-4 bg-terracota text-cream font-bold text-[15px] py-3.5 rounded-full" onclick="openCheckout()">Finalizar compra</button>
+  </div>
+
+  <div id="drawer-empty" class="flex-1 flex flex-col items-center justify-center text-center px-8">
+    <div class="w-20 h-20 rounded-full bg-creme2 flex items-center justify-center">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#9A3412" stroke-width="1.5"><path d="M6 8h12l-1 12H7L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+    </div>
+    <p class="mt-4 text-[15px] font-semibold text-tijolo">Sua sacola está vazia</p>
+    <p class="text-[13px] text-tinta/55 mt-1">Adicione delícias e volte aqui.</p>
+    <button class="press mt-4 bg-tijolo text-cream text-[13px] font-semibold px-5 py-2.5 rounded-full" onclick="closeCart()">Explorar produtos</button>
+  </div>
+</aside>
+
+<!-- ===== CHECKOUT MODAL ===== -->
+<div class="modal" id="checkout">
+  <div class="mback" onclick="closeCheckout()"></div>
+  <div class="mbox" id="checkout-box"></div>
+</div>
+
+<div class="toast" id="toast">Adicionado à sacola</div>
+
+<script>
+const IMG={
+  cheese:'https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=500&q=70',
+  cheese2:'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=500&q=70',
+  doce:'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=500&q=70',
+  jam:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=500&q=70',
+  coffee:'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=500&q=70',
+  coffeecup:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=500&q=70',
+  cachaca:'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=500&q=70',
+  sausage:'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=500&q=70',
+  bread:'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=500&q=70',
+  gift:'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=500&q=70'
+};
+const seloColor={CANASTRA:'#15803D','SELO ORIGEM':'#15803D','PREMIADO':'#D97706','PREMIADO EM VIÇOSA':'#D97706',ARTESANAL:'#9A3412',PRESENTE:'#D97706'};
+
+const CATS=[
+  {id:'todos',label:'Todos'},
+  {id:'queijos',label:'Queijos'},
+  {id:'doces',label:'Doces & Compotas'},
+  {id:'cafes',label:'Cafés & Cachaças'},
+  {id:'embutidos',label:'Embutidos'},
+  {id:'kits',label:'Kits & Cestas'}
+];
+const CATCARDS=[
+  {id:'queijos',title:'Queijos Premiados',e:'🧀',img:IMG.cheese},
+  {id:'doces',title:'Doces & Compotas',e:'🍮',img:IMG.doce},
+  {id:'cafes',title:'Cafés Especiais',e:'☕',img:IMG.coffee},
+  {id:'cafes',title:'Cachaças & Licores',e:'🥃',img:IMG.cachaca}
+];
+
+const P=[
+  {n:'Queijo Canastra Meia Cura',u:'Peça 500g',price:60,cat:'queijos',selo:'CANASTRA',e:'🧀',img:IMG.cheese},
+  {n:'Queijo Coalho Du Norte',u:'Peça 400g',price:48,cat:'queijos',selo:'ARTESANAL',e:'🧀',img:IMG.cheese2},
+  {n:'Colonial da Serra da Abelha',u:'Peça 500g',price:58,cat:'queijos',selo:'ARTESANAL',e:'🧀',img:IMG.cheese},
+  {n:'Requeijão do Norte',u:'Pote 350g',price:56,cat:'queijos',selo:'ARTESANAL',e:'🧀',img:IMG.cheese2},
+  {n:'Doce de Leite Cremoso de Viçosa',u:'Pote 410g',price:32,cat:'doces',selo:'PREMIADO EM VIÇOSA',e:'🍮',img:IMG.doce},
+  {n:'Goiabada Cascão da Roça',u:'Barra 600g',price:28,cat:'doces',selo:'ARTESANAL',e:'🍬',img:IMG.jam},
+  {n:'Compota de Figo em Calda',u:'Pote 300g',price:38,cat:'doces',selo:'ARTESANAL',e:'🫙',img:IMG.jam},
+  {n:'Compota de Doce de Leite',u:'Pote 400g',price:44,cat:'doces',selo:'ARTESANAL',e:'🍮',img:IMG.doce},
+  {n:'Café Especial Torrado na Fazenda',u:'Pacote 500g',price:46,cat:'cafes',selo:'PREMIADO',e:'☕',img:IMG.coffee},
+  {n:'Café Coado Tradicional Moído',u:'Pacote 500g',price:34,cat:'cafes',selo:'ARTESANAL',e:'☕',img:IMG.coffeecup},
+  {n:'Cachaça Envelhecida em Jequitibá',u:'Garrafa 700ml',price:119,cat:'cafes',selo:'ARTESANAL',e:'🥃',img:IMG.cachaca},
+  {n:'Licor de Doce de Leite',u:'Garrafa 500ml',price:45,cat:'cafes',selo:'ARTESANAL',e:'🥃',img:IMG.cachaca},
+  {n:'Salame Artesanal da Canastra',u:'Peça 400g',price:38,cat:'embutidos',selo:'CANASTRA',e:'🥓',img:IMG.sausage},
+  {n:'Lombo Canastra Defumado',u:'Peça 400g',price:54,cat:'embutidos',selo:'ARTESANAL',e:'🥓',img:IMG.sausage},
+  {n:'Linguiça Artesanal Defumada',u:'Peça 500g',price:39,cat:'embutidos',selo:'ARTESANAL',e:'🌭',img:IMG.sausage},
+  {n:'Kit Café da Manhã Mineiro',u:'Cesta completa',price:189,cat:'kits',selo:'SELO ORIGEM',e:'🎁',img:IMG.gift},
+  {n:'Kit Tábua de Frios & Cachaça',u:'Kit presente',price:229,cat:'kits',selo:'PRESENTE',e:'🎁',img:IMG.gift}
+];
+P.forEach((p,i)=>p.id=i);
+
+const FREE_SHIP=200;
+const brl=v=>'R$ '+v.toFixed(2).replace('.',',');
+const cart={};
+let state={cat:'todos',q:''};
+let coupon=null;
+let payMethod='pix';
+
+/* ---- categorias em destaque ---- */
+document.getElementById('cat-cards').innerHTML=CATCARDS.map(c=>`
+  <a href="#vitrine" onclick="setCat('${c.id}')" class="card press group relative rounded-2xl overflow-hidden h-44 lg:h-52 block">
+    <div class="imgwrap h-full">
+      <span class="emoji">${c.e}</span>
+      <img src="${c.img}" onerror="this.remove()" alt="${c.title}">
+      <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(60,20,8,.85),rgba(60,20,8,.05));"></div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 p-4">
+      <p class="font-display font-semibold text-cream text-[18px] leading-tight">${c.title}</p>
+      <span class="inline-flex items-center gap-1 text-cream/85 text-[12px] font-semibold mt-1">Ver produtos
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FDFBF7" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </a>`).join('');
+
+/* ---- filtros ---- */
+function renderFilters(){
+  document.getElementById('filters').innerHTML=CATS.map(c=>`
+    <button class="press px-4 py-2 rounded-full text-[13px] font-semibold border transition ${c.id===state.cat?'bg-terracota text-cream border-terracota':'bg-white text-tijolo border-creme2 hover:border-ambar'}"
+      onclick="setCat('${c.id}')">${c.label}</button>`).join('');
+}
+function setCat(id){ state.cat=id; renderFilters(); renderGrid(); }
+function setQuery(q){ state.q=q.toLowerCase(); renderGrid(); }
+
+/* ---- vitrine ---- */
+function renderGrid(){
+  let items=P.filter(p=>(state.cat==='todos'||p.cat===state.cat)&&(!state.q||p.n.toLowerCase().includes(state.q)));
+  const t=CATS.find(c=>c.id===state.cat);
+  document.getElementById('vitrine-title').textContent=state.cat==='todos'?'Todos os produtos':t.label;
+  document.getElementById('empty').classList.toggle('hidden',items.length>0);
+  document.getElementById('grid').innerHTML=items.map(p=>`
+    <div class="card bg-cardbg rounded-2xl overflow-hidden border border-creme2 flex flex-col">
+      <div class="imgwrap aspect-square">
+        <span class="emoji">${p.e}</span>
+        <img src="${p.img}" onerror="this.remove()" alt="${p.n}" loading="lazy">
+        <span class="selo absolute top-2.5 left-2.5" style="color:${seloColor[p.selo]||'#9A3412'}">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 5.8L20 8l-4.5 4L17 18l-5-3.2L7 18l1.5-6L4 8l5.6-.2z"/></svg>${p.selo}
+        </span>
+      </div>
+      <div class="p-3.5 flex flex-col flex-1">
+        <h3 class="font-semibold text-tinta text-[13.5px] leading-snug flex-1">${p.n}</h3>
+        <p class="text-[11.5px] text-tinta/50 mt-0.5">${p.u}</p>
+        <div class="flex items-center justify-between mt-3">
+          <span class="font-display font-semibold text-tijolo text-[18px]">${brl(p.price)}</span>
+        </div>
+        <button class="press w-full mt-2.5 bg-tijolo hover:bg-terracota text-cream text-[13px] font-semibold py-2.5 rounded-full flex items-center justify-center gap-1.5" onclick="addToCart(${p.id})">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FDFBF7" stroke-width="2.2"><path d="M6 8h12l-1 12H7L6 8z" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
+          Adicionar à sacola
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+/* ---- carrinho ---- */
+function count(){return Object.values(cart).reduce((a,q)=>a+q,0);}
+function subtotal(){return Object.entries(cart).reduce((a,[id,q])=>a+P[id].price*q,0);}
+function updateBadge(){const n=count(),b=document.getElementById('cart-badge');b.textContent=n;b.style.display=n>0?'flex':'none';}
+function addToCart(id){cart[id]=(cart[id]||0)+1;updateBadge();renderDrawer();showToast(P[id].n.split(' ').slice(0,2).join(' ')+' na sacola');flashCart();}
+function changeQty(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];updateBadge();renderDrawer();}
+function flashCart(){const d=document.getElementById('drawer');if(!d.classList.contains('open'))openCart();}
+
+function renderDrawer(){
+  const n=count();
+  const items=document.getElementById('drawer-items');
+  const foot=document.getElementById('drawer-foot');
+  const empty=document.getElementById('drawer-empty');
+  const shipbar=document.getElementById('ship-bar');
+  if(n===0){
+    items.style.display='none';foot.style.display='none';shipbar.style.display='none';
+    empty.style.display='flex';document.getElementById('drawer-sub').textContent='Confira seus itens';
+    return;
+  }
+  items.style.display='block';foot.style.display='block';shipbar.style.display='block';empty.style.display='none';
+  document.getElementById('drawer-sub').textContent=n+(n===1?' item':' itens');
+
+  items.innerHTML=Object.entries(cart).map(([id,q])=>{
+    const p=P[id];
+    return `<div class="flex gap-3 py-3 border-b border-creme2">
+      <div class="imgwrap w-[70px] h-[70px] rounded-xl flex-shrink-0">
+        <span class="emoji" style="font-size:26px">${p.e}</span>
+        <img src="${p.img}" onerror="this.remove()" alt="">
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex justify-between gap-2">
+          <p class="text-[13px] font-semibold text-tinta leading-tight">${p.n}</p>
+          <button class="text-tinta/40 hover:text-terracota flex-shrink-0" onclick="removeItem(${id})" aria-label="Remover">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <p class="text-[11px] text-tinta/50">${p.u}</p>
+        <div class="flex items-center justify-between mt-1.5">
+          <span class="font-display font-semibold text-tijolo text-[14px]">${brl(p.price*q)}</span>
+          <div class="flex items-center gap-2.5 bg-cream rounded-full px-1 py-0.5 border border-creme2">
+            <button class="press w-6 h-6 rounded-full flex items-center justify-center" onclick="changeQty(${id},-1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7C2D12" stroke-width="2.6"><path d="M5 12h14" stroke-linecap="round"/></svg></button>
+            <span class="text-[13px] font-bold text-tijolo w-4 text-center">${q}</span>
+            <button class="press w-6 h-6 rounded-full flex items-center justify-center" onclick="changeQty(${id},1)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7C2D12" stroke-width="2.6"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // frete grátis
+  const sub=subtotal();
+  const pct=Math.min(100,sub/FREE_SHIP*100);
+  document.getElementById('ship-fill').style.width=pct+'%';
+  document.getElementById('ship-msg').innerHTML = sub>=FREE_SHIP
+    ? '🎉 <b class="text-oliva">Você ganhou frete grátis!</b>'
+    : `Faltam <b class="text-terracota">${brl(FREE_SHIP-sub)}</b> para o frete grátis`;
+
+  updateTotals();
+}
+function removeItem(id){delete cart[id];updateBadge();renderDrawer();}
+
+function updateTotals(){
+  const sub=subtotal();
+  document.getElementById('sub-val').textContent=brl(sub);
+  let desc=0;const row=document.getElementById('desc-row');
+  if(coupon){desc=sub*coupon.rate;document.getElementById('desc-label').textContent='Cupom '+coupon.code;document.getElementById('desc-val').textContent='- '+brl(desc);row.classList.remove('hidden');}
+  else row.classList.add('hidden');
+  document.getElementById('total-val').textContent=brl(Math.max(0,sub-desc));
+}
+function applyCoupon(){
+  const code=document.getElementById('coupon').value.trim();
+  const msg=document.getElementById('coupon-msg');msg.classList.remove('hidden');
+  const valid={UAI10:0.10,MINAS15:0.15};
+  if(valid[code]){coupon={code,rate:valid[code]};msg.textContent='Cupom aplicado: '+(valid[code]*100)+'% de desconto.';msg.className='text-[11.5px] mb-2 text-oliva font-semibold';showToast('Cupom '+code+' aplicado');}
+  else{coupon=null;msg.textContent='Cupom inválido. Tente UAI10.';msg.className='text-[11.5px] mb-2 text-terracota font-semibold';}
+  updateTotals();
+}
+
+function openCart(){document.getElementById('drawer').classList.add('open');document.getElementById('backdrop').classList.add('open');}
+function closeCart(){document.getElementById('drawer').classList.remove('open');document.getElementById('backdrop').classList.remove('open');}
+
+/* ---- checkout ---- */
+function openCheckout(){
+  if(count()===0)return;
+  const sub=subtotal();const desc=coupon?sub*coupon.rate:0;const total=Math.max(0,sub-desc);
+  renderCheckout(total);
+  document.getElementById('checkout').classList.add('open');
+}
+function closeCheckout(){document.getElementById('checkout').classList.remove('open');}
+function renderCheckout(total){
+  document.getElementById('checkout-box').innerHTML=`
+    <div class="p-6">
+      <div class="flex items-center justify-between">
+        <h3 class="font-display font-semibold text-tijolo text-[21px]">Finalizar compra</h3>
+        <button class="press w-8 h-8 rounded-full bg-creme2 flex items-center justify-center" onclick="closeCheckout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C2D12" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg></button>
+      </div>
+      <p class="text-[13px] text-tinta/60 mt-1">Total a pagar <span class="font-display font-semibold text-tijolo text-[17px] ml-1">${brl(total)}</span></p>
+
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        <button id="pay-pix" class="press rounded-2xl border-2 border-oliva bg-oliva/5 p-3.5 text-left" onclick="selectPay('pix')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#15803D"><path d="M12 2l3 3-3 3-3-3 3-3zm-7 7l3-3 3 3-3 3-3-3zm14 0l-3-3-3 3 3 3 3-3zm-7 7l-3-3 3-3 3 3-3 3z"/></svg>
+          <p class="text-[14px] font-bold text-tijolo mt-1.5">Pix</p><p class="text-[11px] text-oliva font-semibold">Aprovação na hora</p>
+        </button>
+        <button id="pay-card" class="press rounded-2xl border-2 border-creme2 bg-white p-3.5 text-left" onclick="selectPay('card')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9A3412" stroke-width="1.8"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>
+          <p class="text-[14px] font-bold text-tijolo mt-1.5">Cartão</p><p class="text-[11px] text-tinta/50 font-semibold">Em até 6x</p>
+        </button>
+      </div>
+      <div id="pay-detail" class="mt-5"></div>
+      <button class="press w-full mt-5 bg-terracota text-cream font-bold text-[15px] py-3.5 rounded-full" onclick="confirmPay(${total})">Confirmar pagamento</button>
+      <p class="text-center text-[11px] text-tinta/45 mt-3">🔒 Ambiente simulado. Nenhuma cobrança é feita.</p>
+    </div>`;
+  selectPay('pix');
+}
+function selectPay(m){
+  payMethod=m;
+  document.getElementById('pay-pix').className='press rounded-2xl border-2 p-3.5 text-left '+(m==='pix'?'border-oliva bg-oliva/5':'border-creme2 bg-white');
+  document.getElementById('pay-card').className='press rounded-2xl border-2 p-3.5 text-left '+(m==='card'?'border-terracota bg-terracota/5':'border-creme2 bg-white');
+  const box=document.getElementById('pay-detail');
+  if(m==='pix'){
+    const code='00020126360014BR.GOV.BCB.PIX0114+55119966146815204000053039865802BR5925DELICIAS AQUI DELICIAS ACO6006COTIA62070503***6304A1B2';
+    box.innerHTML=`<div class="bg-creme2/50 rounded-2xl p-4 text-center">
+      <div class="w-32 h-32 mx-auto rounded-xl bg-white p-2 border border-creme2">${qrSvg()}</div>
+      <p class="text-[11.5px] text-tinta/60 mt-3">Pix Copia e Cola</p>
+      <div class="mt-1.5 bg-white border border-creme2 rounded-xl p-2 flex items-center gap-2">
+        <span class="text-[9.5px] text-tinta/70 truncate flex-1 text-left font-mono">${code.slice(0,36)}…</span>
+        <button class="press bg-oliva text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg flex-shrink-0" onclick="copyPix('${code}')">Copiar</button>
+      </div>
+    </div>`;
+  }else{
+    box.innerHTML=`<div class="space-y-2.5">
+      <input class="w-full bg-white border border-creme2 rounded-xl px-3 py-2.5 text-[13px] outline-none focus:border-ambar" placeholder="Número do cartão" inputmode="numeric">
+      <div class="flex gap-2.5">
+        <input class="flex-1 bg-white border border-creme2 rounded-xl px-3 py-2.5 text-[13px] outline-none focus:border-ambar" placeholder="Validade">
+        <input class="w-24 bg-white border border-creme2 rounded-xl px-3 py-2.5 text-[13px] outline-none focus:border-ambar" placeholder="CVV">
+      </div>
+      <input class="w-full bg-white border border-creme2 rounded-xl px-3 py-2.5 text-[13px] outline-none focus:border-ambar" placeholder="Nome impresso no cartão">
+      <select class="w-full bg-white border border-creme2 rounded-xl px-3 py-2.5 text-[13px] outline-none focus:border-ambar text-tinta/80">
+        <option>1x sem juros</option><option>2x sem juros</option><option>3x sem juros</option><option>6x sem juros</option>
+      </select>
+    </div>`;
+  }
+}
+function qrSvg(){
+  let cells='';const seed=[1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1,1,0,1,0,0,1,1,0,1];
+  for(let y=0;y<11;y++)for(let x=0;x<11;x++){
+    const on=(x*7+y*3+seed[(x+y)%25])%3===0||(x<3&&y<3)||(x>7&&y<3)||(x<3&&y>7);
+    if(on)cells+=`<rect x="${x*9}" y="${y*9}" width="9" height="9"/>`;
+  }
+  return `<svg viewBox="0 0 99 99" width="100%" height="100%" fill="#2A211A">${cells}</svg>`;
+}
+function copyPix(code){
+  const done=()=>showToast('Código Pix copiado');
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(code).then(done).catch(done);
+  else{const t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(t);done();}
+}
+function confirmPay(total){
+  document.getElementById('checkout-box').innerHTML=`
+    <div class="p-8 text-center">
+      <div class="w-20 h-20 mx-auto rounded-full bg-oliva/12 flex items-center justify-center">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3 class="font-display font-semibold text-tijolo text-[22px] mt-4">Pedido confirmado!</h3>
+      <p class="text-[13.5px] text-tinta/65 mt-2 leading-snug">Recebemos seu pagamento de <b class="text-tijolo">${brl(total)}</b> via ${payMethod==='pix'?'Pix':'cartão'}. Já estamos preparando suas delícias com carinho.</p>
+      <div class="bg-creme2/50 rounded-2xl p-3 mt-4 flex items-center gap-3 text-left">
+        <span class="text-[26px]">🚚</span>
+        <div><p class="text-[12.5px] font-semibold text-tijolo">Pedido #${2042+Math.floor(Math.random()*50)}</p><p class="text-[11.5px] text-tinta/55">Enviado em embalagem térmica</p></div>
+      </div>
+      <button class="press w-full mt-5 bg-tijolo text-cream font-bold text-[15px] py-3.5 rounded-full" onclick="finishOrder()">Continuar comprando</button>
+    </div>`;
+}
+function finishOrder(){
+  for(const k in cart)delete cart[k];coupon=null;
+  document.getElementById('coupon').value='';document.getElementById('coupon-msg').classList.add('hidden');
+  updateBadge();renderDrawer();closeCheckout();closeCart();
+  showToast('Uai, obrigado pela preferência!');
+}
+
+/* ---- utilidades ---- */
+function toggleMenu(){document.getElementById('mobmenu').classList.toggle('open');}
+function subscribe(e){e.preventDefault();e.target.reset();showToast('Pronto! Use o cupom UAI10 na primeira compra.');}
+let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1900);}
+
+const header=document.getElementById('header');
+window.addEventListener('scroll',()=>header.classList.toggle('shrink',window.scrollY>10));
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.fadeup').forEach(el=>io.observe(el));
+
+/* ---- init ---- */
+renderFilters();renderGrid();renderDrawer();updateBadge();
+</script>
+</body>
+</html>
